@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Advanced Task Manager</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+			}
+			.task {
+				border: 1px solid #ccc;
+				padding: 10px;
+				margin: 10px 0;
+			}
+			.task.completed {
+				text-decoration: line-through;
+			}
+			.controls {
+				margin: 10px 0;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="root"></div>
+		<script src="https://www.unpkg.com/react@18.2.0/umd/react.development.js"></script>
+		<script src="https://www.unpkg.com/react-dom@18.2.0/umd/react-dom.development.js"></script>
+		<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+		<script type="text/babel">
+			function Task({ task, onUpdate, onDelete }) {
+				return (
+					<div className={`task ${task.isCompleted ? "completed" : ""}`}>
+						<h3>{task.title}</h3>
+						<p>Assigned to: {task.assignee}</p>
+						<p>Status: {task.isCompleted ? "Completed" : "Incomplete"}</p>
+						<button onClick={() => onUpdate(task)}>Update</button>
+						<button onClick={() => onDelete(task.id)}>Delete</button>
+					</div>
+				);
+			}
+
+			function App() {
+				const [tasks, setTasks] = React.useState([]);
+				const [newTask, setNewTask] = React.useState({
+					title: "",
+					isCompleted: false,
+					assignee: "",
+				});
+				const [filter, setFilter] = React.useState("");
+
+				const fetchTasks = async () => {
+					const response = await axios.get("http://localhost:3001/todos");
+					setTasks(response.data);
+				};
+
+				const addTask = async () => {
+					if (newTask.title === "" || newTask.assignee === "") {
+						alert("Please fill in both fields.");
+						return;
+					}
+					const response = await axios.post(
+						"http://localhost:3001/todos",
+						newTask
+					);
+					setTasks([...tasks, response.data]);
+					setNewTask({ title: "", isCompleted: false, assignee: "" });
+				};
+
+				const updateTask = async (task) => {
+					const updatedTask = { ...task, isCompleted: !task.isCompleted };
+					await axios.put(
+						`http://localhost:3001/todos/${task.id}`,
+						updatedTask
+					);
+					setTasks(tasks.map((t) => (t.id === task.id ? updatedTask : t)));
+				};
+
+				const deleteTask = async (id) => {
+					await axios.delete(`http://localhost:3001/todos/${id}`);
+					setTasks(tasks.filter((t) => t.id !== id));
+				};
+
+				const filteredTasks = tasks
+					.filter((task) =>
+						filter === "incomplete" ? !task.isCompleted : true
+					)
+					.filter((task) =>
+						filter && filter !== "incomplete" ? task.assignee === filter : true
+					);
+
+				React.useEffect(() => {
+					fetchTasks();
+				}, []);
+
+				return (
+					<div>
+						<h1>Advanced Task Manager</h1>
+
+						<div>
+							<input
+								type="text"
+								placeholder="Task Title"
+								value={newTask.title}
+								onChange={(e) =>
+									setNewTask({ ...newTask, title: e.target.value })
+								}
+							/>
+							<input
+								type="text"
+								placeholder="Assignee"
+								value={newTask.assignee}
+								onChange={(e) =>
+									setNewTask({ ...newTask, assignee: e.target.value })
+								}
+							/>
+							<button onClick={addTask}>Add Task</button>
+						</div>
+
+						<div className="controls">
+							<button onClick={fetchTasks}>Get All Tasks</button>
+							<button onClick={() => setFilter("")}>Show All</button>
+							<button onClick={() => setFilter("incomplete")}>
+								Show Incomplete
+							</button>
+							<input
+								type="text"
+								placeholder="Filter by Assignee"
+								onChange={(e) => setFilter(e.target.value)}
+							/>
+						</div>
+
+						<div>
+							{filteredTasks.map((task) => (
+								<Task
+									key={task.id}
+									task={task}
+									onUpdate={updateTask}
+									onDelete={deleteTask}
+								/>
+							))}
+						</div>
+					</div>
+				);
+			}
+
+			ReactDOM.render(<App />, document.getElementById("root"));
+		</script>
+	</body>
+</html>

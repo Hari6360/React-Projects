@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>React Counter</title>
+	</head>
+	<body>
+		<div id="root"></div>
+		<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+		<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+		<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+		<script type="text/babel">
+			const TodoList = () => {
+				const arr = [
+					{ id: 1, title: "Item 1", status: True },
+					{ id: 2, title: "Item 2", status: False },
+					{ id: 3, title: "Item 3", status: True },
+					{ id: 4, title: "Item 4", status: False },
+				];
+				return (
+					<div>
+						<ul>
+							{arr.map((el) => {
+								return <li key={el}>{el.title}</li>;
+							})}
+						</ul>
+					</div>
+				);
+			};
+			const App = () => {
+				return (
+					<div>
+						<TodoList />
+					</div>
+				);
+			};
+
+			const createRoot = ReactDOM.createRoot(document.getElementById("root"));
+			createRoot.render(<App />);
+		</script>
+	</body>
+</html>

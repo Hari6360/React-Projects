@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>React Counter</title>
+	</head>
+	<body>
+		<div id="root"></div>
+		<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+		<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+		<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+		<script type="text/babel">
+			const TodoList = () => {
+				const [todos, setTodos] = React.useState([]);
+				const URL = "http://localhost:8080/todos";
+
+				const getData = () => {
+					axios
+						.get(URL)
+						.then((res) => {
+							setTodos(res.data);
+						})
+						.catch((err) => {
+							console.log(err);
+						});
+				};
+
+				const handleDelete = (id) => {
+					axios
+						.delete(`${URL}/${id}`)
+						.then((res) => {
+							getData();
+						})
+						.catch((err) => {
+							console.log(err);
+						});
+				};
+				return (
+					<div>
+						<button onClick={getData}>Get Data</button>
+						<ul>
+							{todos.map((el) => {
+								return (
+									<li key={el.id}>
+										{el.title} - {el.status ? "Completed" : "Pending"}
+										<p> {el.assignedTo}</p>
+										<button
+											onClick={() => {
+												handleDelete(el.id);
+											}}>
+											Delete
+										</button>
+									</li>
+								);
+							})}
+						</ul>
+					</div>
+				);
+			};
+			const initialState = {
+				title: "",
+				status: false,
+				assignedTo: "",
+			};
+
+			const Form = () => {
+				const [data, setData] = React.useState(initialState);
+				const URL = "http://localhost:8080/todos";
+
+				const handleChange = (e) => {
+					const { name, type, value, checked } = e.target;
+					setData({
+						...data,
+						[name]: type === "checkbox" ? checked : value,
+					});
+				};
+
+				const handleSubmit = (e) => {
+					e.preventDefault();
+					axios
+						.post(URL, data)
+						.then((response) => {
+							console.log("Data submitted successfully", response);
+						})
+						.catch((error) => {
+							console.error("Error submitting data", error);
+						});
+				};
+
+				return (
+					<div>
+						<form onSubmit={handleSubmit}>
+							<input
+								type="text"
+								name="title"
+								placeholder="Enter Your Name"
+								value={data.title}
+								onChange={handleChange}
+							/>
+							<br />
+							<br />
+							<label htmlFor="status">Completed Status</label>
+							<input
+								type="checkbox"
+								name="status"
+								checked={data.status}
+								onChange={handleChange}
+							/>
+							<br />
+							<br />
+							<select
+								name="assignedTo"
+								value={data.assignedTo}
+								onChange={handleChange}>
+								<option value="">Select assigned to</option>
+								<option value="a">A</option>
+								<option value="b">B</option>
+								<option value="c">C</option>
+							</select>
+							<br />
+							<button type="submit">Submit</button>
+						</form>
+					</div>
+				);
+			};
+
+			const App = () => {
+				return (
+					<div>
+						<Form />
+						<TodoList />
+					</div>
+				);
+			};
+
+			const createRoot = ReactDOM.createRoot(document.getElementById("root"));
+			createRoot.render(<App />);
+		</script>
+	</body>
+</html>

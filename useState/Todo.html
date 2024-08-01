@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Template</title>
+	</head>
+	<body>
+		<div id="root"></div>
+	</body>
+	<script src="https://www.unpkg.com/react@18.2.0/umd/react.development.js"></script>
+	<script src="https://www.unpkg.com/react-dom@18.2.0/umd/react-dom.development.js"></script>
+	<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+	<script type="text/babel">
+		const TodoList = ({ todo, handleToggle, handleDelete }) => {
+			return (
+				<div>
+					{todo.map((el) => {
+						return (
+							<div
+								key={el.id}
+								style={{ backgroundColor: el.status ? "Green" : "Red" }}>
+								<h1>{el.title}</h1>
+								<h3>{el.status ? "completed" : "Active"}</h3>
+								<button
+									onClick={() => {
+										handleToggle(el.id);
+									}}>
+									Toggle Status
+								</button>
+								<button onClick={() => handleDelete(el.id)}>Delete</button>
+							</div>
+						);
+					})}
+				</div>
+			);
+		};
+		const Todo = () => {
+			const [text, setText] = React.useState("");
+			const [todo, setTodo] = React.useState([]);
+			const [filter, setFilter] = React.useState("All");
+
+			const handleAdd = () => {
+				let obj = {
+					id: todo.length + 1,
+					title: text,
+					status: false,
+				};
+				setTodo([...todo, obj]);
+				setText("");
+				console.log(todo);
+			};
+			const handleToggle = (id) => {
+				let toggleStatus = todo.map((el) =>
+					el.id === id ? { ...el, status: !el.status } : el
+				);
+				setTodo(toggleStatus);
+			};
+			const handleDelete = (id) => {
+				let filteredData = todo.filter((el) => el.id !== id);
+				setTodo(filteredData);
+			};
+			const getFilteredTodos = () => {
+				if (filter === "Active") return todo.filter((el) => !el.status);
+				if (filter === "Completed") return todo.filter((el) => el.status);
+				return todo;
+			};
+			return (
+				<>
+					<div>
+						<input
+							type="text"
+							placeholder="Enter Your Todo"
+							value={text}
+							onChange={(e) => {
+								setText(e.target.value);
+							}}
+						/>
+						<button onClick={handleAdd}>ADD</button>
+						<div>
+							<div>
+								<button onClick={() => setFilter("All")}>All</button>
+								<button onClick={() => setFilter("Active")}>Active</button>
+								<button onClick={() => setFilter("Completed")}>
+									Completed
+								</button>
+							</div>
+						</div>
+						<TodoList
+							todo={getFilteredTodos()}
+							handleToggle={handleToggle}
+							handleDelete={handleDelete}
+						/>
+					</div>
+				</>
+			);
+		};
+
+		const App = () => {
+			return <Todo />;
+		};
+		const root = ReactDOM.createRoot(document.getElementById("root"));
+		root.render(<App />);
+	</script>
+</html>

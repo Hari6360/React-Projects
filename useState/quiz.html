@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Template</title>
+	</head>
+	<body>
+		<div id="root"></div>
+	</body>
+	<script src="https://www.unpkg.com/react@18.2.0/umd/react.development.js"></script>
+	<script src="https://www.unpkg.com/react-dom@18.2.0/umd/react-dom.development.js"></script>
+	<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+	<script type="text/babel">
+		const { useState } = React;
+
+		const Quiz = () => {
+			const questions = [
+				{
+					question: "What is the capital of France?",
+					options: ["Paris", "London", "Rome", "Berlin"],
+					answer: "Paris",
+				},
+				{
+					question: "Which language is used to style web pages?",
+					options: ["HTML", "JQuery", "CSS", "XML"],
+					answer: "CSS",
+				},
+				{
+					question: "Which is not a JavaScript Framework?",
+					options: ["Python Script", "JQuery", "Django", "NodeJS"],
+					answer: "Django",
+				},
+			];
+
+			const [currentAnswers, setCurrentAnswers] = useState(
+				Array(questions.length).fill(null)
+			);
+			const [score, setScore] = useState(null);
+
+			const handleAnswerChange = (index, option) => {
+				const newAnswers = [...currentAnswers];
+				newAnswers[index] = option;
+				setCurrentAnswers(newAnswers);
+			};
+
+			const handleSubmit = () => {
+				let newScore = 0;
+				for (let i = 0; i < questions.length; i++) {
+					if (currentAnswers[i] === questions[i].answer) {
+						newScore++;
+					}
+				}
+				setScore(newScore);
+			};
+
+			const handleRestart = () => {
+				setCurrentAnswers(Array(questions.length).fill(null));
+				setScore(null);
+			};
+
+			return (
+				<div>
+					{score === null ? (
+						<div>
+							{questions.map((q, index) => (
+								<div key={index}>
+									<h3>{q.question}</h3>
+									{q.options.map((option) => (
+										<label key={option}>
+											<input
+												type="radio"
+												name={`question-${index}`}
+												value={option}
+												checked={currentAnswers[index] === option}
+												onChange={() => handleAnswerChange(index, option)}
+											/>
+											{option}
+										</label>
+									))}
+								</div>
+							))}
+							<button onClick={handleSubmit}>Submit</button>
+						</div>
+					) : (
+						<div>
+							<h2>
+								Your Score: {score} / {questions.length}
+							</h2>
+							<button onClick={handleRestart}>Restart Quiz</button>
+						</div>
+					)}
+				</div>
+			);
+		};
+
+		ReactDOM.render(<Quiz />, document.getElementById("root"));
+	</script>
+</html>

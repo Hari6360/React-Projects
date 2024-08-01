@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>User Profiles</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				padding: 20px;
+			}
+			.profile {
+				border: 1px solid #ddd;
+				padding: 10px;
+				margin: 10px 0;
+				border-radius: 5px;
+			}
+			.search {
+				margin-bottom: 20px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="root"></div>
+	</body>
+	<script src="https://www.unpkg.com/react@18.2.0/umd/react.development.js"></script>
+	<script src="https://www.unpkg.com/react-dom@18.2.0/umd/react-dom.development.js"></script>
+	<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+	<script type="text/babel">
+		function UserProfile({ user }) {
+			return (
+				<div className="profile">
+					<h2>{user.name}</h2>
+					<p>Email: {user.email}</p>
+					<p>Phone: {user.phone}</p>
+				</div>
+			);
+		}
+
+		function App() {
+			const [users, setUsers] = React.useState([]);
+			const [search, setSearch] = React.useState("");
+
+			React.useEffect(() => {
+				const userData = [
+					{
+						id: 1,
+						name: "John Doe",
+						email: "john.doe@example.com",
+						phone: "123-456-7890",
+					},
+					{
+						id: 2,
+						name: "Jane Smith",
+						email: "jane.smith@example.com",
+						phone: "234-567-8901",
+					},
+					{
+						id: 3,
+						name: "Alice Johnson",
+						email: "alice.johnson@example.com",
+						phone: "345-678-9012",
+					},
+					{
+						id: 4,
+						name: "Bob Brown",
+						email: "bob.brown@example.com",
+						phone: "456-789-0123",
+					},
+				];
+				setUsers(userData);
+			}, []);
+
+			const filteredUsers = users.filter((user) =>
+				user.name.toLowerCase().includes(search.toLowerCase())
+			);
+
+			return (
+				<div>
+					<input
+						className="search"
+						type="text"
+						value={search}
+						onChange={(e) => setSearch(e.target.value)}
+						placeholder="Search profiles by name..."
+					/>
+					<div>
+						{filteredUsers.map((user) => (
+							<UserProfile key={user.id} user={user} />
+						))}
+					</div>
+				</div>
+			);
+		}
+
+		ReactDOM.render(<App />, document.getElementById("root"));
+	</script>
+</html>

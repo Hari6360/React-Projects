@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+	</head>
+	<body>
+		<div id="root"></div>
+		<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+		<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+		<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+		<script type="text/babel">
+			// function Navbar() {
+			// 	return <div>I am Navbar</div>;
+			// }
+			// function Body() {
+			// 	return <div>I am Body</div>;
+			// }
+			// function Footer() {
+			// 	return <div>I am Footer</div>;
+			// }
+			// function App() {
+			// 	return (
+			// 		<div>
+			// 			<Navbar />
+			// 			<Body />
+			// 			<Footer />
+			// 		</div>
+			// 	);
+			// }
+			function Tweet(val) {
+				return (
+					<div>
+						Name :{val.name}
+						Age:{val.age}
+						Add:{val.city}
+						voter:{val.age > 18 ? "Eligilble" : "Not Eligible"}
+					</div>
+				);
+			}
+
+			function App() {
+				return (
+					<div>
+						<Tweet name="Hari" age={20} city="Blr" />
+					</div>
+				);
+			}
+
+			const reactRoot = ReactDOM.createRoot(document.getElementById("root"));
+			reactRoot.render(<App />);
+		</script>
+	</body>
+</html>

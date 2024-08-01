@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Todo List</title>
+	</head>
+	<body>
+		<div id="root"></div>
+	</body>
+	<script src="https://www.unpkg.com/react@18.2.0/umd/react.development.js"></script>
+	<script src="https://www.unpkg.com/react-dom@18.2.0/umd/react-dom.development.js"></script>
+	<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+	<script type="text/babel">
+		const { useState } = React;
+
+		const TodoApp = () => {
+			const [todos, setTodos] = useState([]);
+			const [task, setTask] = useState("");
+			const [filter, setFilter] = useState("all");
+
+			const addTodo = () => {
+				if (task.trim() !== "") {
+					setTodos([...todos, { text: task, completed: false }]);
+					setTask("");
+				}
+			};
+
+			const toggleTodo = (index) => {
+				const newTodos = todos.map((todo, i) =>
+					i === index ? { ...todo, completed: !todo.completed } : todo
+				);
+				setTodos(newTodos);
+			};
+
+			const removeTodo = (index) => {
+				const newTodos = todos.filter((_, i) => i !== index);
+				setTodos(newTodos);
+			};
+
+			const filteredTodos = todos.filter((todo) => {
+				if (filter === "all") return true;
+				if (filter === "active") return !todo.completed;
+				if (filter === "completed") return todo.completed;
+			});
+
+			return (
+				<div style={{ padding: "20px", maxWidth: "500px", margin: "auto" }}>
+					<h1>Todo List</h1>
+					<input
+						type="text"
+						value={task}
+						onChange={(e) => setTask(e.target.value)}
+						placeholder="Add a new task"
+					/>
+					<button onClick={addTodo}>Add</button>
+					<div style={{ marginTop: "20px" }}>
+						<button onClick={() => setFilter("all")}>All</button>
+						<button onClick={() => setFilter("active")}>Active</button>
+						<button onClick={() => setFilter("completed")}>Completed</button>
+					</div>
+					<ul style={{ listStyle: "none", padding: "0" }}>
+						{filteredTodos.map((todo, index) => (
+							<li
+								key={index}
+								style={{
+									display: "flex",
+									alignItems: "center",
+									margin: "10px 0",
+								}}>
+								<input
+									type="checkbox"
+									checked={todo.completed}
+									onChange={() => toggleTodo(index)}
+								/>
+								<span
+									style={{
+										textDecoration: todo.completed ? "line-through" : "none",
+										marginLeft: "10px",
+									}}>
+									{todo.text}
+								</span>
+								<button
+									onClick={() => removeTodo(index)}
+									style={{ marginLeft: "auto" }}>
+									Remove
+								</button>
+							</li>
+						))}
+					</ul>
+				</div>
+			);
+		};
+
+		ReactDOM.render(<TodoApp />, document.getElementById("root"));
+	</script>
+</html>
